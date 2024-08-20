@@ -1,12 +1,12 @@
-commit QmTZ1jFegssY2e82WNj9w4mvuSUQ21hQKQPrcJGVsLqkQm
+commit QmaNZ3Qz1kMfpFw4KbZiNgbwXhtkMknHpsBVdFgTU5TnFo
 Branch: main
 Signed-off by: danimesq.eth (0xDDfC2e10702d8A781727A34D83B3bb3CA94a3E91)
-Signature: 2f1cff4c848c48389039bd982659070c05fdb58b5106e9abe8735eb5a46e7bc02db50704e28c9d71f26f57ec31d923819d208e9a5d01c6a40a4f14531141405100
+Signature: 0258872b1a6a41a60d113c98a52ebf06e3395537d7ba0f1e0a2431afc9360c4324b2532e47b3a4290ea34c5b2084c198f0459d21455e302aa461727b54d69dbe01
 
 ------------------------------
 
-Commit CID if including git's SHA1: QmNTKbgfWrTUR1NPbTEy7V4aGWTeFAcUptUqCSZBMUMjSN
-Commit CID if containing only file hashes: QmZLNoR711MnPp9fQP8AR3tNEwcRkwrKJrdU3Vttg7vBZ3
+Commit CID if including git's SHA1: Qmacffaeq5nimT5zEv2XgqcqQES7eXKNiyhxaeZcn2DKFz
+Commit CID if containing only file hashes: QmbuYuGU1fcCiAdWMvdDBgA8S7jvj6x2DhNXAgUD51PdNU
 
 ------------------------------
 
@@ -17,7 +17,7 @@ Remote URL: https://github.com/PeepzHQ/heypeepz.git
 
 ------------------------------
 
-chown -h 1000:1000 'apps/web/src/components/Publication/ThreadBody.tsx'
-chmod 0664 'apps/web/src/components/Publication/ThreadBody.tsx'
-/usr/bin/touch -hcmd "2024-08-20 18:57:53.4609741440 -0300" 'apps/web/src/components/Publication/ThreadBody.tsx'
-/usr/bin/touch -hcad "2024-08-20 18:57:53.5049746320 -0300" 'apps/web/src/components/Publication/ThreadBody.tsx'
+chown -h 1000:1000 'Tasks.txt'
+chmod 0664 'Tasks.txt'
+/usr/bin/touch -hcmd "2024-08-20 20:26:11.5455023370 -0300" 'Tasks.txt'
+/usr/bin/touch -hcad "2024-08-20 20:26:17.0375229340 -0300" 'Tasks.txt'

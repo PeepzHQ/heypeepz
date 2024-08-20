@@ -1,4 +1,12 @@
+---------------------------------------------------------------------------------------
+was still being implemented, have to complement the latest commits:
 - Tell abt another type of ratio: when an answer have more likes than the root post
+-
+show a "percent until ratio", which will come as "% ratioed", only when it reach 50%
+---------------------------------------------------------------------------------------
+what post to test the 50% ratio: https://web-jv1mlfku0-heyxyz.vercel.app/posts/0x04e14d-0x10-DA-0157d38e
+where to test Peepz: https://github.com/heyxyz/hey/pull/5244
+
 - set Farcaster, Threads, Bluesky, Mastodon and Peepeth profiles!
 - set profile pic from IPFS! button on settings on the right side of the "Choose" file button in the "Avatar" heading ; can do the same for Cover
 - understand how Hey/Peepz sends data to be posted, so make this feature: profile backgrounds! (from either file or IPFS)
@@ -11,7 +19,6 @@
 
 - "Threads" tab on user profile (a Thread is a root post that has a dept of 2 sequential replies from OP)
 
-show a "percent until ratio", which will come as "% ratioed", only when it reach 50%
 Notify OP when a reply has 50% and 100% ratioed (first, understand how the codebase handles notifications on Lens)
 
 - on "Setup your Peepz profile", show this on profile too, with a progressbar
