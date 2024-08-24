@@ -47,7 +47,17 @@ const Footer: FC = () => {
       )}
     >
       <span className="ld-text-gray-500 font-bold">
-        &copy; {currentYear} {APP_NAME}.xyz
+        &copy; {currentYear} {APP_NAME}.lol by{' '}
+        <Link
+          className="outline-offset-4"
+          href="https://sociflow.github.io"
+          key={link.href}
+          onClick={link.onClick}
+          rel="noreferrer noopener"
+          target={link.href.startsWith('http') ? '_blank' : undefined}
+        >
+          Sociflow
+        </Link>
       </span>
       {links.map((link) => (
         <Link
