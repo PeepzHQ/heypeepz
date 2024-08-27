@@ -1,0 +1,257 @@
+<pre><font color="#42E66C">     __  ,</font>
+<font color="#42E66C"> .--()°&apos;.&apos; </font>Welcome to <font color="#42E66C">Nushell</font>,
+<font color="#42E66C">&apos;|, . ,&apos;   </font>based on the <font color="#42E66C">nu</font> language,
+<font color="#42E66C"> !_-(_\    </font>where all data is structured!
+
+Please join our <font color="#E64747">Discord</font> community at <font color="#E64747">https://discord.gg/NtAbbGn</font>
+Our <font color="#50FA7B"><b>GitHub</b></font> repository is at <font color="#50FA7B"><b>https://github.com/nushell/nushell</b></font>
+Our <font color="#42E66C">Documentation</font> is located at <font color="#42E66C">https://nushell.sh</font>
+<font color="#75D7EC">Tweet</font> us at <font color="#8BE9FD"><b>@nu_shell</b></font>
+Learn how to remove this at: <font color="#42E66C">https://nushell.sh/book/configuration.html#remove-welcome-message</font>
+
+It&apos;s been this long since <font color="#42E66C">Nushell</font>&apos;s first commit:
+5yrs 3months 17days 1hr 45secs 573ms 992µs 610ns 
+
+Startup Time: 88ms 390µs 723ns
+
+
+<font color="#8BE9FD"><b>/media/daniella/Ubuntu</b></font> <span style="background-color:#8A15E2"><font color="#6E46A4"><b> 🕙 14:59:57 </b></font></span> took <font color="#F1FA8C"><b>823ms</b></font> <font color="#50FA7B"><b>❯</b></font>  <font color="#75D7EC">folderstamp</font> <font color="#50FA7B"><b>save</b></font> <font color="#50FA7B"><b>-r</b></font>
+🤓📝 Working...
+^C
+
+<font color="#8BE9FD"><b>/media/daniella/Ubuntu</b></font> <span style="background-color:#8A15E2"><font color="#6E46A4"><b> 🕙 15:00:08 </b></font></span> took <font color="#F1FA8C"><b>8s</b></font> <font color="#FF79C6"><b>✗</b></font>  <font color="#75D7EC">folderstamp</font> <font color="#50FA7B"><b>save</b></font>
+🤓📝 Working...
+Error: &apos;$RECYCLE.BIN&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+Error: &apos;at origin, rmv the original bc the up-to-date will be this&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+Error: &apos;detect_windows&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+Error: &apos;Floflis&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+Error: &apos;found.000&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+Error: &apos;https%3a%2f%2fcygwin.mirror.constant.com%2f&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+Error: &apos;peepz icon history&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+Error: &apos;PokeIcons&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+Error: &apos;rmv-after-commit&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+Error: &apos;System Volume Information&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+Error: &apos;Windows&apos; is a directory, use the &apos;-r&apos; flag to specify directories
+
+USAGE
+  ipfs add &lt;path&gt;... - Add a file or directory to IPFS.
+
+  ipfs add [--recursive | -r] [--dereference-args] [--stdin-name=&lt;stdin-name&gt;]
+           [--hidden | -H] [--ignore=&lt;ignore&gt;]...
+           [--ignore-rules-path=&lt;ignore-rules-path&gt;] [--quiet | -q]
+           [--quieter | -Q] [--silent] [--progress | -p] [--trickle | -t]
+           [--only-hash | -n] [--wrap-with-directory | -w]
+           [--chunker=&lt;chunker&gt; | -s] [--raw-leaves] [--nocopy] [--fscache]
+           [--cid-version=&lt;cid-version&gt;] [--hash=&lt;hash&gt;] [--inline]
+           [--inline-limit=&lt;inline-limit&gt;] [--pin=false] [--to-files=&lt;to-files&gt;]
+           [--] &lt;path&gt;...
+
+  Adds the content of &lt;path&gt; to IPFS. Use -r to add directories (recursively).
+
+  For more information about each command, use:
+  &apos;ipfs add &lt;subcmd&gt; --help&apos;
+
+
+
+<font color="#8BE9FD"><b>/media/daniella/Ubuntu</b></font> <span style="background-color:#8A15E2"><font color="#6E46A4"><b> 🕙 15:00:21 </b></font></span> took <font color="#F1FA8C"><b>2s</b></font> <font color="#50FA7B"><b>❯</b></font>  
+</pre>

@@ -1,4 +1,3 @@
-- new branding for icon/logo
 - PWA support https://vite-pwa-org.netlify.app/guide/pwa-minimal-requirements
 
 ---------------------------------------------------------------------------------------

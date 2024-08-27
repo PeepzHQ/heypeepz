@@ -1,12 +1,12 @@
-commit QmY1fhJZcpg1kFGVQq4zBWHQ3H4VyAeSNHsdCAErB5nx5Q
+commit QmSJPWKzniTd1BMT5Dshn7hj4N7tMRaWSszHfAJTLE4Vxr
 Branch: main
 Signed-off by: danimesq.eth (0xDDfC2e10702d8A781727A34D83B3bb3CA94a3E91)
-Signature: 7162e59468131432ea276b7ff599a7b95bdfada4c3488cbd85123ba9d0d1404f3e8621832d9dff4027174dcaf41b24df32752bd38dfc0e7e566375ab6ea1e3e401
+Signature: 5ac98f96f98a9866dfe936eef18772386d6e1b4507879e14041b62abcc0a3fff74c3fb1ee246d0d0ca28431065d9bc5fffff9e44ea6a4b149c811eb280a5ce0400
 
 ------------------------------
 
-Commit CID if including git's SHA1: QmbQn596MbEwy64bpFN3HcDzfC6HJijMB17NVJxPdtyt7e
-Commit CID if containing only file hashes: QmSAbti3WCRX4j6b5N4HwrqzdQ4QkrR6AJ51EYHs8DGiqU
+Commit CID if including git's SHA1: QmXHWRdJvoJL24y397tm8fPs8Mty92qDyoF6jxyzZ84Ni8
+Commit CID if containing only file hashes: QmSzaXTtF184ze22KWX6NenkGxfPJCpjYy2f5fJtxepijS
 
 ------------------------------
 
@@ -19,5 +19,73 @@ Remote URL: https://github.com/PeepzHQ/heypeepz.git
 
 chown -h 1000:1000 'Tasks.txt'
 chmod 0664 'Tasks.txt'
-/usr/bin/touch -hcmd "2024-08-27 16:11:33.2361433550 -0300" 'Tasks.txt'
-/usr/bin/touch -hcad "2024-08-27 16:12:40.5922706300 -0300" 'Tasks.txt'
+/usr/bin/touch -hcmd "2024-08-27 16:51:57.9661882770 -0300" 'Tasks.txt'
+/usr/bin/touch -hcad "2024-08-27 16:52:03.0961880760 -0300" 'Tasks.txt'
+chown -h 1000:1000 'apps/web/public/.legacy/.folderstamp2'
+chmod 0664 'apps/web/public/.legacy/.folderstamp2'
+/usr/bin/touch -hcmd "2024-08-27 15:00:21.0406599000 -0300" 'apps/web/public/.legacy/.folderstamp2'
+/usr/bin/touch -hcad "2024-08-27 16:51:13.9252137680 -0300" 'apps/web/public/.legacy/.folderstamp2'
+chown -h 1000:1000 'apps/web/public/.legacy/.folderstamp2.log.html5'
+chmod 0664 'apps/web/public/.legacy/.folderstamp2.log.html5'
+/usr/bin/touch -hcmd "2024-08-27 15:00:42.7648460000 -0300" 'apps/web/public/.legacy/.folderstamp2.log.html5'
+/usr/bin/touch -hcad "2024-08-27 16:51:13.9252137680 -0300" 'apps/web/public/.legacy/.folderstamp2.log.html5'
+chown -h 1000:1000 'apps/web/public/.legacy/.folderstamp3'
+chmod 0664 'apps/web/public/.legacy/.folderstamp3'
+/usr/bin/touch -hcmd "2024-08-27 15:41:41.5243544630 -0300" 'apps/web/public/.legacy/.folderstamp3'
+/usr/bin/touch -hcad "2024-08-27 16:51:13.9262137660 -0300" 'apps/web/public/.legacy/.folderstamp3'
+chown -h 1000:1000 'apps/web/public/.legacy/16x16.png.log.html5.txt'
+chmod 0664 'apps/web/public/.legacy/16x16.png.log.html5.txt'
+/usr/bin/touch -hcmd "2024-08-27 16:19:41.6983956290 -0300" 'apps/web/public/.legacy/16x16.png.log.html5.txt'
+/usr/bin/touch -hcad "2024-08-27 16:51:13.9272137650 -0300" 'apps/web/public/.legacy/16x16.png.log.html5.txt'
+chown -h 1000:1000 'apps/web/public/.legacy/32x32.png.log.html5.txt'
+chmod 0664 'apps/web/public/.legacy/32x32.png.log.html5.txt'
+/usr/bin/touch -hcmd "2024-08-27 16:19:15.7792019660 -0300" 'apps/web/public/.legacy/32x32.png.log.html5.txt'
+/usr/bin/touch -hcad "2024-08-27 16:51:13.9272137650 -0300" 'apps/web/public/.legacy/32x32.png.log.html5.txt'
+chown -h 1000:1000 'apps/web/public/.legacy/ati.png.log.html5.txt'
+chmod 0664 'apps/web/public/.legacy/ati.png.log.html5.txt'
+/usr/bin/touch -hcmd "2024-08-27 16:15:54.9258260880 -0300" 'apps/web/public/.legacy/ati.png.log.html5.txt'
+/usr/bin/touch -hcad "2024-08-27 16:51:13.9282137640 -0300" 'apps/web/public/.legacy/ati.png.log.html5.txt'
+chown -h 1000:1000 'apps/web/public/.legacy/favicon.ico.log.html5.txt'
+chmod 0664 'apps/web/public/.legacy/favicon.ico.log.html5.txt'
+/usr/bin/touch -hcmd "2024-08-27 16:03:52.7736011360 -0300" 'apps/web/public/.legacy/favicon.ico.log.html5.txt'
+/usr/bin/touch -hcad "2024-08-27 16:51:13.9282137640 -0300" 'apps/web/public/.legacy/favicon.ico.log.html5.txt'
+chown -h 1000:1000 'apps/web/public/.legacy/icon.svg'
+chmod 0755 'apps/web/public/.legacy/icon.svg'
+/usr/bin/touch -hcmd "2024-08-26 22:15:16.8939371000 -0300" 'apps/web/public/.legacy/icon.svg'
+/usr/bin/touch -hcad "2024-08-27 16:51:13.9112137830 -0300" 'apps/web/public/.legacy/icon.svg'
+chown -h 1000:1000 'apps/web/public/.legacy/icon_pride.svg'
+chmod 0755 'apps/web/public/.legacy/icon_pride.svg'
+/usr/bin/touch -hcmd "2024-08-26 22:14:24.9243308000 -0300" 'apps/web/public/.legacy/icon_pride.svg'
+/usr/bin/touch -hcad "2024-08-27 16:20:13.6728296900 -0300" 'apps/web/public/.legacy/icon_pride.svg'
+chown -h 1000:1000 'apps/web/public/.legacy/logo.png.log.html5.txt'
+chmod 0664 'apps/web/public/.legacy/logo.png.log.html5.txt'
+/usr/bin/touch -hcmd "2024-08-27 15:59:56.5759436090 -0300" 'apps/web/public/.legacy/logo.png.log.html5.txt'
+/usr/bin/touch -hcad "2024-08-27 16:51:13.9302137620 -0300" 'apps/web/public/.legacy/logo.png.log.html5.txt'
+chown -h 1000:1000 'apps/web/public/.legacy/pride.png.log.html5.txt'
+chmod 0664 'apps/web/public/.legacy/pride.png.log.html5.txt'
+/usr/bin/touch -hcmd "2024-08-27 16:01:46.8950902120 -0300" 'apps/web/public/.legacy/pride.png.log.html5.txt'
+/usr/bin/touch -hcad "2024-08-27 16:51:13.9302137620 -0300" 'apps/web/public/.legacy/pride.png.log.html5.txt'
+chown -h 1000:1000 'apps/web/public/16x16.png'
+chmod 0664 'apps/web/public/16x16.png'
+/usr/bin/touch -hcmd "2024-08-27 16:19:27.7937588530 -0300" 'apps/web/public/16x16.png'
+/usr/bin/touch -hcad "2024-08-27 16:20:15.4949101790 -0300" 'apps/web/public/16x16.png'
+chown -h 1000:1000 'apps/web/public/32x32.png'
+chmod 0664 'apps/web/public/32x32.png'
+/usr/bin/touch -hcmd "2024-08-27 16:19:02.8015933170 -0300" 'apps/web/public/32x32.png'
+/usr/bin/touch -hcad "2024-08-27 16:20:15.5009104440 -0300" 'apps/web/public/32x32.png'
+chown -h 1000:1000 'apps/web/public/ati.png'
+chmod 0664 'apps/web/public/ati.png'
+/usr/bin/touch -hcmd "2024-08-27 16:15:41.4820483500 -0300" 'apps/web/public/ati.png'
+/usr/bin/touch -hcad "2024-08-27 16:16:00.6311525700 -0300" 'apps/web/public/ati.png'
+chown -h 1000:1000 'apps/web/public/favicon.ico'
+chmod 0664 'apps/web/public/favicon.ico'
+/usr/bin/touch -hcmd "2024-08-27 16:03:25.5431277780 -0300" 'apps/web/public/favicon.ico'
+/usr/bin/touch -hcad "2024-08-27 16:03:57.6263772630 -0300" 'apps/web/public/favicon.ico'
+chown -h 1000:1000 'apps/web/public/logo.png'
+chmod 0664 'apps/web/public/logo.png'
+/usr/bin/touch -hcmd "2024-08-27 15:59:37.0041520820 -0300" 'apps/web/public/logo.png'
+/usr/bin/touch -hcad "2024-08-27 15:59:39.8308543410 -0300" 'apps/web/public/logo.png'
+chown -h 1000:1000 'apps/web/public/pride.png'
+chmod 0664 'apps/web/public/pride.png'
+/usr/bin/touch -hcmd "2024-08-27 16:01:20.6897656610 -0300" 'apps/web/public/pride.png'
+/usr/bin/touch -hcad "2024-08-27 16:01:30.9538798870 -0300" 'apps/web/public/pride.png'
