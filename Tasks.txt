@@ -1,3 +1,6 @@
+- new branding for icon/logo
+- PWA support https://vite-pwa-org.netlify.app/guide/pwa-minimal-requirements
+
 ---------------------------------------------------------------------------------------
 was still being implemented, have to complement the latest commits:
 - Tell abt another type of ratio: when an answer have more likes than the root post
@@ -22,3 +25,5 @@ where to test Peepz: https://github.com/heyxyz/hey/pull/5244
 Notify OP when a reply has 50% and 100% ratioed (first, understand how the codebase handles notifications on Lens)
 
 - on "Setup your Peepz profile", show this on profile too, with a progressbar
+
+- Hero.tsx: incentivize to use Trust Wallet's Swift
