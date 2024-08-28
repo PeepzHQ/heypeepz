@@ -50,14 +50,26 @@ const Footer: FC = () => {
         &copy; {currentYear} {APP_NAME}.lol by{' '}
         <Link
           className="outline-offset-4"
-          href="https://sociflow.github.io"
+          href="https://pannetso.github.io/"
           key={link.href}
           onClick={link.onClick}
           rel="noreferrer noopener"
           target={link.href.startsWith('http') ? '_blank' : undefined}
         >
-          Sociflow
+          Pannet
         </Link>
+        . Forked from
+        <Link
+          className="outline-offset-4"
+          href="https://hey.xyz/"
+          key={link.href}
+          onClick={link.onClick}
+          rel="noreferrer noopener"
+          target={link.href.startsWith('http') ? '_blank' : undefined}
+        >
+          Hey.xyz
+        </Link>
+        .
       </span>
       {links.map((link) => (
         <Link
