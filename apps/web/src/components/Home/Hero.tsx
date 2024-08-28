@@ -19,7 +19,7 @@ const Hero: FC = () => {
           <div className="ld-text-gray-500 text-xl font-bold sm:text-3xl">
             the forefront of{' '}
             <Link
-              href="https://medium.com/@HashBrown_Research/deso-the-future-of-web3-socialfi-1b38d7e1939d"
+              href="https://plisio.net/blog/decentralized-social-media-deso-new-horizons"
               rel="noopener noreferrer"
               target="_blank"
             >
