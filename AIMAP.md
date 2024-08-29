@@ -191,3 +191,247 @@ Final Codebase Context
 I've reviewed the project structure and content. Here's an expanded AIMAP.txt file with more detailed instructions for AI programmers:
 
 Remember to follow the existing code style and patterns when adding new features or making changes. Always consider performance implications, especially when working with blockchain interactions or large datasets.
+
+## Bookmarks Feature
+
+The Bookmarks feature in the Hey app allows users to save and view their bookmarked publications. Here's an overview of the key components and files related to this feature:
+
+### Main Bookmarks Page
+
+- **File**: `apps/web/src/pages/bookmarks.tsx`
+- **Purpose**: Entry point for the Bookmarks page
+- **Renders**: The `Bookmarks` component
+
+### Bookmarks Component
+
+- **File**: `apps/web/src/components/Bookmarks/index.tsx`
+- **Purpose**: Main component for the Bookmarks page
+- **Key features**:
+  - Uses `useProfileStore` to check if a user is logged in
+  - Implements analytics tracking for page views
+  - Renders the bookmarks feed and sidebar components
+- **Code reference**:
+
+### GraphQL Query
+
+- **File**: `packages/lens/documents/queries/PublicationBookmarks.graphql`
+- **Purpose**: Defines the GraphQL query for fetching bookmarked publications
+- **Used by**: The `usePublicationBookmarksQuery` hook in the Feed component
+
+### Generated Types and Hooks
+
+- **File**: `packages/lens/generated.ts`
+- **Purpose**: Contains generated TypeScript types and Apollo hooks for Lens Protocol interactions
+- **Key exports**:
+  - `usePublicationBookmarksQuery`
+  - `useAddPublicationBookmarkMutation`
+  - `useRemovePublicationBookmarkMutation`
+
+When working with the Bookmarks feature:
+
+1. Use the `usePublicationBookmarksQuery` hook to fetch bookmarked publications.
+2. Implement bookmark/unbookmark functionality using the respective mutation hooks.
+3. Ensure proper error handling and loading states in the UI.
+4. Consider pagination and performance optimizations for users with many bookmarks.
+5. Integrate with the global state management (Zustand stores) if needed for cross-component communication.
+
+## External Server Connections
+
+Apart from GraphQL/Lens interactions, the Hey app connects to several external services:
+
+1. **ClickHouse**: Used for analytics data storage and querying.
+
+   - Relevant files: `apps/api/src/lib/clickhouse.ts`
+
+2. **Redis**: Used for caching and temporary data storage.
+
+   - Relevant files: `apps/api/src/lib/redis.ts`
+
+3. **S3 (or compatible object storage)**: Used for storing user-generated content like images.
+
+   - Relevant files: `packages/image-cropper/src/lib/uploadToIPFS.ts`
+
+4. **Momoka**: Data availability layer for off-chain content.
+
+   - Relevant files: Check `packages/lens` for Momoka-related queries and mutations.
+
+5. **Ethereum nodes**: For blockchain interactions (e.g., contract calls, transaction signing).
+   - Relevant files: Check `packages/abis` and `packages/contracts` for Ethereum-related code.
+
+## Setup Tutorial
+
+To set up the Hey social network, follow these steps:
+
+1. **Prerequisites**:
+
+   - Install Node.js (v18 or later)
+   - Install pnpm: `npm install -g pnpm`
+   - Install Docker and Docker Compose
+
+2. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/your-hey-repo.git
+   cd hey
+   ```
+
+3. **Install dependencies**:
+
+   ```bash
+   pnpm install
+   ```
+
+4. **Set up environment variables**:
+   Create a `.env.local` file in the root directory and add the following variables:
+
+   ```
+   # Lens Protocol
+   NEXT_PUBLIC_LENS_NETWORK=mainnet
+   NEXT_PUBLIC_LENS_API_URL=https://api.lens.dev
+
+   # Database
+   DATABASE_URL=postgresql://username:password@localhost:5432/hey
+
+   # Redis
+   REDIS_URL=redis://localhost:6379
+
+   # ClickHouse
+   CLICKHOUSE_URL=http://localhost:8123
+   CLICKHOUSE_USER=default
+   CLICKHOUSE_PASSWORD=
+
+   # S3 or IPFS
+   NEXT_PUBLIC_EVER_API_KEY=your-ever-api-key
+   NEXT_PUBLIC_EVER_ENDPOINT=https://endpoint.4everland.co
+
+   # Ethereum
+   NEXT_PUBLIC_ALCHEMY_KEY=your-alchemy-key
+   NEXT_PUBLIC_INFURA_ID=your-infura-id
+
+   # Other services
+   NEXT_PUBLIC_IMAGEKIT_URL=https://ik.imagekit.io/your-project
+   NEXT_PUBLIC_IMAGEKIT_ID=your-imagekit-id
+   ```
+
+   Replace the placeholder values with your actual credentials.
+
+5. **Set up local services**:
+   Create a `docker-compose.yml` file in the root directory with the following content:
+
+   ```yaml
+   version: '3'
+   services:
+     postgres:
+       image: postgres:13
+       environment:
+         POSTGRES_DB: hey
+         POSTGRES_USER: username
+         POSTGRES_PASSWORD: password
+       ports:
+         - '5432:5432'
+
+     redis:
+       image: redis:6
+       ports:
+         - '6379:6379'
+
+     clickhouse:
+       image: clickhouse/clickhouse-server:22
+       ports:
+         - '8123:8123'
+   ```
+
+   Run `docker-compose up -d` to start these services.
+
+6. **Initialize the database**:
+
+   ```bash
+   pnpm run db:push
+   ```
+
+7. **Start the development server**:
+
+   ```bash
+   pnpm dev
+   ```
+
+8. **Access the app**:
+   Open your browser and navigate to `http://localhost:3000`
+
+Remember to set up the necessary external services (Ethereum nodes, IPFS/S3, etc.) and update the `.env.local` file with the correct credentials before deploying to production.
+
+For production deployment, consider using platforms like Vercel for the web app and Railway for the API and cron jobs, as mentioned in the deployment instructions.
+
+## Docker Installation and Setup
+
+To install Docker and Docker Compose, use the following commands:
+
+1. Install Docker:
+
+   ```bash
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   sudo sh get-docker.sh
+   ```
+
+2. Install Docker Compose:
+
+   ```bash
+   sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+   sudo chmod +x /usr/local/bin/docker-compose
+   ```
+
+3. Start Docker services:
+   ```bash
+   docker-compose up -d
+   ```
+
+## External Services and Their Purposes
+
+1. **PostgreSQL**:
+
+   - Purpose: Main database for storing user data, posts, and other application-specific information.
+   - Usage: Stores persistent data that needs to be queried and updated frequently.
+   - Configuration: See the `docker-compose.yml` file for setup details.
+
+2. **Redis**:
+
+   - Purpose: In-memory data store used for caching and temporary data storage.
+   - Usage: Improves performance by caching frequently accessed data and managing session information.
+   - Configuration: See the `docker-compose.yml` file for setup details.
+
+3. **ClickHouse**:
+
+   - Purpose: Analytics database for event tracking and data analysis.
+   - Usage: Stores and processes large volumes of event data for user behavior analysis and reporting.
+   - Configuration: See the `docker-compose.yml` file for setup details.
+
+4. **S3 (or compatible object storage)**:
+
+   - Purpose: Stores user-generated content like images and other media files.
+   - Usage: Provides scalable and reliable storage for user uploads and other static assets.
+   - Configuration: Set up in the `.env.local` file with the `NEXT_PUBLIC_EVER_API_KEY` and `NEXT_PUBLIC_EVER_ENDPOINT` variables.
+
+5. **Momoka**:
+
+   - Purpose: Data availability layer for off-chain content.
+   - Usage: Enables faster and cheaper transactions by storing some data off-chain while maintaining verifiability.
+   - Configuration: Integrated through the Lens Protocol; check `packages/lens` for related queries and mutations.
+
+6. **Ethereum nodes**:
+
+   - Purpose: For blockchain interactions such as contract calls and transaction signing.
+   - Usage: Enables interaction with the Ethereum blockchain for features like profile creation, following, and other on-chain actions.
+   - Configuration: Set up in the `.env.local` file with the `NEXT_PUBLIC_ALCHEMY_KEY` and `NEXT_PUBLIC_INFURA_ID` variables.
+
+7. **Lens Protocol API**:
+
+   - Purpose: Core protocol for social graph and content management.
+   - Usage: Provides the foundation for decentralized social networking features.
+   - Configuration: Set up in the `.env.local` file with the `NEXT_PUBLIC_LENS_API_URL` variable.
+
+8. **ImageKit**:
+   - Purpose: Image processing and delivery service.
+   - Usage: Optimizes and serves images for better performance and user experience.
+   - Configuration: Set up in the `.env.local` file with the `NEXT_PUBLIC_IMAGEKIT_URL` and `NEXT_PUBLIC_IMAGEKIT_ID` variables.
+
+When setting up these services, ensure that all necessary environment variables are properly configured in your `.env.local` file and that the required services are running before starting the application.
