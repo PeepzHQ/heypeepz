@@ -2,860 +2,932 @@
 
 ## User:
 
-Where are this social networks' Bookmarks stored?
+When user is doing a post, what JSON data is sent?
 
-In an external server, or using NextJS?
+How it is formatted and how it will be onchain?
 
-## AI (gpt-4-turbo-2024-04-09):
+## AI (claude-3.5-sonnet):
 
-The bookmarks in this social network are managed through interactions with an external server, specifically using GraphQL queries to a service that likely represents a backend server handling the Lens Protocol. This is evident from the use of GraphQL queries to fetch and manage bookmark data.
+To understand how a post is created and formatted in the Hey app, we need to look at several components and processes. Let's break it down:
 
-For instance, the `Feed` component in the `Bookmarks` directory uses a GraphQL query to fetch bookmarked publications. This is set up in the `usePublicationBookmarksQuery` hook, which is configured with a GraphQL query defined in the `PublicationBookmarks.graphql` file. The query fetches data based on a `PublicationBookmarksRequest`, which includes parameters like `limit` and `where` conditions that filter the publications based on their metadata.
+1. Post Creation:
+   The process starts in the `NewPublication` component:
 
-Here are the relevant code references:
-
-- **GraphQL Query Setup**:
-
-```1:21:packages/lens/documents/queries/PublicationBookmarks.graphql
-query PublicationBookmarks($request: PublicationBookmarksRequest!) {
-  publicationBookmarks(request: $request) {
-    items {
-      ... on Post {
-        ...PostFields
-      }
-      ... on Comment {
-        ...CommentFields
-      }
-      ... on Mirror {
-        ...MirrorFields
-      }
-      ... on Quote {
-        ...QuoteFields
-      }
+```310:506:apps/web/src/components/Composer/NewPublication.tsx
+  const createPublication = async () => {
+    if (!currentProfile) {
+      return toast.error(Errors.SignWallet);
     }
-    pageInfo {
-      next
+
+    if (isSuspended) {
+      return toast.error(Errors.Suspended);
     }
-  }
-}
-```
 
-- **Usage of GraphQL Query in Feed Component**:
-
-```12:115:apps/web/src/components/Bookmarks/Feed.tsx
-import { LimitType, usePublicationBookmarksQuery } from '@hey/lens';
-import { Card, EmptyState, ErrorMessage } from '@hey/ui';
-import { useRef } from 'react';
-import { Virtuoso } from 'react-virtuoso';
-import { useImpressionsStore } from 'src/store/non-persisted/useImpressionsStore';
-import { useTipsStore } from 'src/store/non-persisted/useTipsStore';
-
-let virtuosoState: any = { ranges: [], screenTop: 0 };
-
-interface FeedProps {
-  focus?: PublicationMetadataMainFocusType;
-}
-
-const Feed: FC<FeedProps> = ({ focus }) => {
-  const { fetchAndStoreViews } = useImpressionsStore();
-  const { fetchAndStoreTips } = useTipsStore();
-  const virtuoso = useRef<VirtuosoHandle>(null);
-
-  const request: PublicationBookmarksRequest = {
-    limit: LimitType.TwentyFive,
-    where: { metadata: { ...(focus && { mainContentFocus: [focus] }) } }
-  };
-
-  const { data, error, fetchMore, loading } = usePublicationBookmarksQuery({
-    onCompleted: async ({ publicationBookmarks }) => {
-      const ids =
-        publicationBookmarks?.items?.map((p) => {
-          return p.__typename === 'Mirror' ? p.mirrorOn?.id : p.id;
-        }) || [];
-      await fetchAndStoreViews(ids);
-      await fetchAndStoreTips(ids);
-    },
-    variables: { request }
-  });
-
-  const publications = data?.publicationBookmarks?.items;
-  const pageInfo = data?.publicationBookmarks?.pageInfo;
-  const hasMore = pageInfo?.next;
-
-  const onScrolling = (scrolling: boolean) => {
-    if (!scrolling) {
-      virtuoso?.current?.getState((state: StateSnapshot) => {
-        virtuosoState = { ...state };
-      });
-    }
-  };
-
-  const onEndReached = async () => {
-    if (hasMore) {
-      const { data } = await fetchMore({
-        variables: { request: { ...request, cursor: pageInfo?.next } }
-      });
-      const ids =
-        data?.publicationBookmarks?.items?.map((p) => {
-          return p.__typename === 'Mirror' ? p.mirrorOn?.id : p.id;
-        }) || [];
-      await fetchAndStoreViews(ids);
-      await fetchAndStoreTips(ids);
-    }
-  };
-  if (loading) {
-    return <PublicationsShimmer />;
-  }
-
-  if (publications?.length === 0) {
-    return (
-      <EmptyState
-        icon={<BookmarkIcon className="size-8" />}
-        message="No bookmarks yet!"
-      />
-    );
-  }
-
-  if (error) {
-    return <ErrorMessage error={error} title="Failed to load bookmark feed" />;
-  }
-
-  return (
-    <Card>
-      <Virtuoso
-        className="virtual-divider-list-window"
-        computeItemKey={(index, publication) => `${publication.id}-${index}`}
-        data={publications}
-        endReached={onEndReached}
-        isScrolling={onScrolling}
-        itemContent={(index, publication) => (
-          <SinglePublication
-            isFirst={index === 0}
-            isLast={index === (publications?.length || 0) - 1}
-            publication={publication as AnyPublication}
-          />
-        )}
-        ref={virtuoso}
-        restoreStateFrom={
-          virtuosoState.ranges.length === 0
-            ? virtuosoState?.current?.getState((state: StateSnapshot) => state)
-            : virtuosoState
+    try {
+      setIsLoading(true);
+      if (hasAudio) {
+        setPublicationContentError('');
+        const parsedData = AudioPublicationSchema.safeParse(audioPublication);
+        if (!parsedData.success) {
+          const issue = parsedData.error.issues[0];
+          setIsLoading(false);
+          return setPublicationContentError(issue.message);
         }
-        useWindowScroll
-      />
-    </Card>
-  );
-};
+      }
+
+      if (publicationContent.length === 0 && attachments.length === 0) {
+        setIsLoading(false);
+        return setPublicationContentError(
+          `${
+            isComment ? 'Comment' : isQuote ? 'Quote' : 'Post'
+          } should not be empty!`
+        );
+      }
+
+      setPublicationContentError('');
+
+      let pollId;
+      if (showPollEditor) {
+        pollId = await createPoll();
+      }
+
+      const processedPublicationContent =
+        publicationContent.length > 0 ? publicationContent : undefined;
+      const title = hasAudio
+        ? audioPublication.title
+        : `${getTitlePrefix()} by ${getProfile(currentProfile).slugWithPrefix}`;
+      const hasAttributes = Boolean(pollId);
+
+      const baseMetadata = {
+        content: processedPublicationContent,
+        title,
+        ...(hasAttributes && {
+          attributes: [
+            ...(pollId
+              ? [
+                  {
+                    key: KNOWN_ATTRIBUTES.POLL_ID,
+                    type: MetadataAttributeType.STRING,
+                    value: pollId
+                  }
+                ]
+              : [])
+          ]
+        }),
+        marketplace: {
+          animation_url: getAnimationUrl(),
+          description: processedPublicationContent,
+          external_url: `https://hey.xyz${getProfile(currentProfile).link}`,
+          name: title
+        }
+      };
+      const metadata = getMetadata({ baseMetadata });
+      const arweaveId = await uploadToArweave(metadata);
+
+      // Payload for the open action module
+      const openActionModules = [];
+
+      if (nftOpenActionEmbed) {
+        openActionModules.push(nftOpenActionEmbed);
+      }
+
+      if (Boolean(collectModule.type)) {
+        openActionModules.push({
+          collectOpenAction: collectModuleParams(collectModule)
+        });
+      }
+
+      // Payload for the Momoka post/comment/quote
+      const momokaRequest:
+        | MomokaCommentRequest
+        | MomokaPostRequest
+        | MomokaQuoteRequest = {
+        ...(isComment && { commentOn: publication?.id }),
+        ...(isQuote && { quoteOn: quotedPublication?.id }),
+        contentURI: `ar://${arweaveId}`
+      };
+
+      if (useMomoka && !nftOpenActionEmbed) {
+        if (canUseLensManager) {
+          if (isComment) {
+            return await createCommentOnMomka(
+              momokaRequest as MomokaCommentRequest
+            );
+          }
+
+          if (isQuote) {
+            return await createQuoteOnMomka(
+              momokaRequest as MomokaQuoteRequest
+            );
+          }
+
+          return await createPostOnMomka(momokaRequest);
+        }
+
+        if (isComment) {
+          return await createMomokaCommentTypedData({
+            variables: { request: momokaRequest as MomokaCommentRequest }
+          });
+        }
+
+        if (isQuote) {
+          return await createMomokaQuoteTypedData({
+            variables: { request: momokaRequest as MomokaQuoteRequest }
+          });
+        }
+
+        return await createMomokaPostTypedData({
+          variables: { request: momokaRequest }
+        });
+      }
+      // Payload for the post/comment/quote
+      const onChainRequest:
+        | OnchainCommentRequest
+        | OnchainPostRequest
+        | OnchainQuoteRequest = {
+        contentURI: `ar://${arweaveId}`,
+        ...(isComment && { commentOn: publication?.id }),
+        ...(isQuote && { quoteOn: quotedPublication?.id }),
+        openActionModules,
+        ...(onlyFollowers && {
+          referenceModule:
+            selectedReferenceModule ===
+            ReferenceModuleType.FollowerOnlyReferenceModule
+              ? { followerOnlyReferenceModule: true }
+              : {
+                  degreesOfSeparationReferenceModule: {
+                    commentsRestricted: true,
+                    degreesOfSeparation,
+                    mirrorsRestricted: true,
+                    quotesRestricted: true
+                  }
+                }
+        })
+      };
+
+      if (canUseLensManager) {
+        if (isComment) {
+          return await createCommentOnChain(
+            onChainRequest as OnchainCommentRequest
+          );
+        }
+
+        if (isQuote) {
+          return await createQuoteOnChain(
+            onChainRequest as OnchainQuoteRequest
+          );
+        }
+
+        return await createPostOnChain(onChainRequest);
+      }
+      if (isComment) {
+        return await createOnchainCommentTypedData({
+          variables: {
+            options: { overrideSigNonce: lensHubOnchainSigNonce },
+            request: onChainRequest as OnchainCommentRequest
+          }
+        });
+      }
+
+      if (isQuote) {
+        return await createOnchainQuoteTypedData({
+          variables: {
+            options: { overrideSigNonce: lensHubOnchainSigNonce },
+            request: onChainRequest as OnchainQuoteRequest
+          }
+        });
+      }
+
+      return await createOnchainPostTypedData({
+        variables: {
+          options: { overrideSigNonce: lensHubOnchainSigNonce },
+          request: onChainRequest
+        }
+      });
+    } catch (error) {
+      onError(error);
+    }
+  };
 ```
 
-This setup indicates that the bookmarks are not stored locally or managed directly within the Next.js application but are instead handled by an external service through API calls.
+This component handles the creation of new posts, comments, and quotes. The key steps are:
+
+a. Collecting user input and metadata
+b. Preparing the publication content
+c. Creating the on-chain request
+
+2. JSON Data Format:
+   The JSON data sent for a new post is structured as an `OnchainPostRequest`. This is defined in the Lens Protocol API. The basic structure looks like this:
+
+```json
+{
+  "contentURI": "ar://<arweave-id>",
+  "openActionModules": [...],
+  "referenceModule": {...}
+}
+```
+
+3. Metadata Preparation:
+   Before sending the post data, the app prepares metadata, which is uploaded to Arweave. This is done in the `createPublication` function:
+
+```354:376:apps/web/src/components/Composer/NewPublication.tsx
+      const baseMetadata = {
+        content: processedPublicationContent,
+        title,
+        ...(hasAttributes && {
+          attributes: [
+            ...(pollId
+              ? [
+                  {
+                    key: KNOWN_ATTRIBUTES.POLL_ID,
+                    type: MetadataAttributeType.STRING,
+                    value: pollId
+                  }
+                ]
+              : [])
+          ]
+        }),
+        marketplace: {
+          animation_url: getAnimationUrl(),
+          description: processedPublicationContent,
+          external_url: `https://hey.xyz${getProfile(currentProfile).link}`,
+          name: title
+        }
+      };
+```
+
+4. Arweave Upload:
+   The metadata is uploaded to Arweave, and the resulting ID is used in the `contentURI` field of the request:
+
+```21:39:apps/api/src/routes/metadata/index.ts
+      const url = 'https://arweave.mainnet.irys.xyz/tx/matic';
+      const token = 'matic';
+      const client = new NodeIrys({
+        key: process.env.PRIVATE_KEY,
+        token,
+        url
+      });
+
+      const account = privateKeyToAccount(`0x${process.env.PRIVATE_KEY}`);
+      const signed = await signMetadata(body, (message) =>
+        account.signMessage({ message })
+      );
+
+      const receipt = await client.upload(JSON.stringify(signed), {
+        tags: [
+          { name: 'content-type', value: 'application/json' },
+          { name: 'App-Name', value: 'Hey.xyz' }
+        ]
+      });
+```
+
+5. On-chain Request:
+   The final on-chain request is prepared here:
+
+```439:461:apps/web/src/components/Composer/NewPublication.tsx
+      const onChainRequest:
+        | OnchainCommentRequest
+        | OnchainPostRequest
+        | OnchainQuoteRequest = {
+        contentURI: `ar://${arweaveId}`,
+        ...(isComment && { commentOn: publication?.id }),
+        ...(isQuote && { quoteOn: quotedPublication?.id }),
+        openActionModules,
+        ...(onlyFollowers && {
+          referenceModule:
+            selectedReferenceModule ===
+            ReferenceModuleType.FollowerOnlyReferenceModule
+              ? { followerOnlyReferenceModule: true }
+              : {
+                  degreesOfSeparationReferenceModule: {
+                    commentsRestricted: true,
+                    degreesOfSeparation,
+                    mirrorsRestricted: true,
+                    quotesRestricted: true
+                  }
+                }
+        })
+      };
+```
+
+6. Sending the Request:
+   Depending on whether the user can use Lens Manager or not, the request is sent using different methods:
+
+```463:502:apps/web/src/components/Composer/NewPublication.tsx
+      if (canUseLensManager) {
+        if (isComment) {
+          return await createCommentOnChain(
+            onChainRequest as OnchainCommentRequest
+          );
+        }
+
+        if (isQuote) {
+          return await createQuoteOnChain(
+            onChainRequest as OnchainQuoteRequest
+          );
+        }
+
+        return await createPostOnChain(onChainRequest);
+      }
+      if (isComment) {
+        return await createOnchainCommentTypedData({
+          variables: {
+            options: { overrideSigNonce: lensHubOnchainSigNonce },
+            request: onChainRequest as OnchainCommentRequest
+          }
+        });
+      }
+
+      if (isQuote) {
+        return await createOnchainQuoteTypedData({
+          variables: {
+            options: { overrideSigNonce: lensHubOnchainSigNonce },
+            request: onChainRequest as OnchainQuoteRequest
+          }
+        });
+      }
+
+      return await createOnchainPostTypedData({
+        variables: {
+          options: { overrideSigNonce: lensHubOnchainSigNonce },
+          request: onChainRequest
+        }
+      });
+```
+
+7. Handling the Transaction:
+   The actual transaction is handled in the `useCreatePublication` hook:
+
+```326:336:apps/web/src/hooks/useCreatePublication.tsx
+  const createPostOnChain = async (request: OnchainPostRequest) => {
+    const variables = {
+      options: { overrideSigNonce: lensHubOnchainSigNonce },
+      request
+    };
+
+    const { data } = await postOnchain({ variables: { request } });
+    if (data?.postOnchain?.__typename === 'LensProfileManagerRelayError') {
+      return await createOnchainPostTypedData({ variables });
+    }
+  };
+```
+
+This process creates a transaction that will be sent to the blockchain. The post data will be stored on-chain as a reference to the Arweave content URI, which contains the full metadata of the post.
+
+The on-chain representation will include:
+
+- The profile ID of the poster
+- The content URI pointing to Arweave
+- Any open action modules
+- Reference module information
+
+The actual content and metadata are stored off-chain in Arweave, with only a reference to this data stored on the blockchain. This approach allows for rich content while keeping on-chain data minimal.
 
 ## User:
 
-Thank you. Please annotate your discovery in a brand new section in @AIMAP.md .
-
-## AI (gpt-4-turbo-2024-04-09):
-
-```markdown:AIMAP.md
-# AIMAP.txt
-
-## Project Overview
-
-Hey is a decentralized, permissionless social media app built with Lens Protocol. It's a large project with a complex codebase, consisting of multiple apps and packages.
-
-## Key Files and Folders
-
-### Apps
-
-- **`apps/api`**:
-
-  - API server for Hey
-  - Handles requests from the web app and other services
-  - Key files:
-    - `src/server.ts`: Main entry point for the API server
-    - `src/routes/`: Contains all API routes
-    - `src/helpers/`: Helper functions for the API
-
-- **`apps/cron`**:
-
-  - Cron jobs for Hey
-  - Handles tasks like backing up data to S3 and processing events
-  - Key files:
-    - `src/index.ts`: Main entry point for cron jobs
-    - `src/jobs/`: Contains individual cron job definitions
-
-- **`apps/invoice`**:
-
-  - Invoice generation app
-  - Generates invoices for users who sign up with a credit card
-  - Key files:
-    - `src/app/page.tsx`: Main page for invoice generation
-
-- **`apps/og`**:
-
-  - Open Graph metadata generation app
-  - Generates OG metadata for Hey pages
-  - Key files:
-    - `src/app/page.tsx`: Main page for OG image generation
-
-- **`apps/web`**:
-  - Main web app for Hey
-  - Provides the user interface for the social media platform
-  - Key files and components:
-    - `src/pages/`: Next.js pages
-    - `src/components/`: React components
-    - `src/hooks/`: Custom React hooks
-    - `src/store/`: State management (e.g., Zustand stores)
-    - `src/styles/`: Global styles and theme
-    - `src/lib/`: Utility functions and helpers
-
-### Packages
-
-- **`packages/abis`**:
-
-  - Contains ABIs (Application Binary Interfaces) for all contracts used in Hey
-  - Each ABI is exported as a separate file (e.g., `LensHub.ts`, `HeyTipping.ts`)
-
-- **`packages/contracts`**:
-
-  - Contains Solidity contracts for Hey
-  - Includes contracts like `HeyLensSignup`, `HeyTipping`
-
-- **`packages/data`**:
-
-  - Contains constants, enums, and other shared data
-  - Key files:
-    - `constants.ts`: Global constants
-    - `feature-flags.ts`: Feature flag definitions
-    - `storage.ts`: Local storage keys
-
-- **`packages/db`**:
-
-  - Database-related code and utilities
-  - Includes Prisma schema, migrations, and database clients
-
-- **`packages/helpers`**:
-
-  - Shared helper functions used across the project
-  - Includes utilities for formatting, validation, and data processing
-
-- **`packages/lens`**:
-
-  - Lens Protocol client and related utilities
-  - Contains GraphQL queries, mutations, and generated types
-
-- **`packages/ui`**:
-
-  - Shared UI components used across the project
-  - Includes basic components like Button, Input, Card, etc.
-
-- **`packages/image-cropper`**:
-  - Image cropping component and related utilities
-
-## Key Technologies and Tools
-
-- **Lens Protocol**: Core protocol for social graph and content management
-- **React**: UI library for building the web app
-- **Next.js**: React framework for server-side rendering and routing
-- **TypeScript**: Typed superset of JavaScript used throughout the project
-- **GraphQL**: Query language for APIs, used with Lens Protocol
-- **Prisma**: ORM for database operations
-- **ClickHouse**: Analytics database for event tracking
-- **Redis**: In-memory data store used for caching
-- **Leafwatch**: Custom analytics and event tracking system
-- **Vitest**: Testing framework
-- **Vercel**: Deployment platform for the web app
-- **Railway**: Deployment platform for the API server and cron jobs
-
-## Key Concepts and Features
-
-1. **Profiles**: User profiles managed through Lens Protocol
-2. **Publications**: Posts, comments, and mirrors (reposts)
-3. **Following/Followers**: Social graph management
-4. **Collect/Like**: Interactions with publications
-5. **Open Actions**: Customizable actions that can be performed on publications
-6. **Momoka**: Data availability layer for off-chain content
-
-## AI Programmer Instructions
-
-- Use the `AIMAP.txt` file to understand the project structure and key files.
-- Use the keywords to help you find relevant information.
-- Use the `packages/lens` package to interact with the Lens Protocol.
-- Use the `packages/db` package to interact with the database.
-- Use the `packages/helpers` package for helper functions.
-- Use the `packages/ui` package for UI components.
-- Use the `packages/image-cropper` package for image cropping.
-- Use the `apps/web` app for the main user interface.
-- Use the `apps/api` app for the API server.
-- Use the `apps/cron` app for cron jobs.
-- Use the `apps/invoice` app for invoice generation.
-- Use the `apps/og` app for Open Graph metadata generation.
-
-1. **Understanding the Codebase**:
-
-   - Start with the `apps/web` directory to understand the main user interface
-   - Examine `apps/api` for backend functionality
-   - Look at `packages/lens` to understand Lens Protocol integration
-
-2. **Working with Lens Protocol**:
-
-   - Use hooks and mutations from `packages/lens` for Lens-related operations
-   - Refer to the Lens Protocol documentation for deeper understanding
-
-3. **State Management**:
-
-   - Check `apps/web/src/store` for Zustand stores
-   - Use appropriate stores for managing global state (e.g., user profile, settings)
-
-4. **UI Components**:
-
-   - Utilize components from `packages/ui` for consistent design
-   - Create new components in `apps/web/src/components` when needed
-
-5. **API Integration**:
-
-   - Use API routes defined in `apps/api/src/routes` for backend operations
-   - Create new routes as needed, following the existing structure
-
-6. **Database Operations**:
-
-   - Use Prisma ORM for database queries (defined in `packages/db`)
-   - Add new models or migrations in the Prisma schema as required
-
-7. **Analytics and Tracking**:
-
-   - Use Leafwatch for event tracking (see `apps/web/src/lib/leafwatch.ts`)
-   - Add new events in `packages/data/tracking.ts`
-
-8. **Testing**:
-
-   - Write unit tests using Vitest
-   - Place tests next to the files they're testing with a `.test.ts` or `.test.tsx` extension
-
-9. **Deployment**:
-
-   - The web app is deployed on Vercel
-   - The API and cron jobs are deployed on Railway
-
-10. **Feature Flags**:
-    - Check `packages/data/feature-flags.ts` for available feature flags
-    - Use these flags to conditionally enable/disable features
-
-- **Lens Protocol:** - Use the `packages/lens` package to interact with the Lens Protocol. - Use the `useProfileQuery` hook to fetch a profile by ID or handle. - Use the `usePublicationsQuery` hook to fetch publications by profile ID or publication ID. - Use the `useSearchProfilesQuery` hook to search for profiles. - Use the `useSearchPublicationsQuery` hook to search for publications. - Use the `useCreateProfileWithHandle` mutation to create a new profile with a handle. - Use the `useFollowMutation` mutation to follow a profile. - Use the `useUnfollowMutation` mutation to unfollow a profile. - Use the `useBlockMutation` mutation to block a profile. - Use the `useUnblockMutation` mutation to unblock a profile. - Use the `useAddReactionMutation` mutation to like a publication. - Use the `useRemoveReactionMutation` mutation to unlike a publication. - Use the `useMirrorOnchainMutation` mutation to mirror a publication. - Use the `useCommentOnchainMutation` mutation to comment on a publication. - Use the `useQuoteOnchainMutation` mutation to quote a publication. - Use the `useSetProfileMetadataMutation` mutation to update a profile's metadata. - Use the `useCreateOnchainSetProfileMetad...(line too long; chars omitted)
-  Please look all over this project, and comple@AIMAP.txt AIMAP.txt file instructing AI Programmers on how to handle this project and where to find specific stuff, to make AI's work easier in such a large database!
-
-Tell what every file do, what page they'll render, etc.
-
-Final Codebase Context
-I've reviewed the project structure and content. Here's an expanded AIMAP.txt file with more detailed instructions for AI programmers:
-
-Remember to follow the existing code style and patterns when adding new features or making changes. Always consider performance implications, especially when working with blockchain interactions or large datasets.
-
-```
-
-## User:
-
-Thank you. Please annotate your discovery about Bookmarks, in a brand new section in @AIMAP.md .
+All of that you said, please write to @AIMAP.md .
 
 ## AI (claude-3.5-sonnet):
 
-Certainly! I'll add a new section to the AIMAP.md file about Bookmarks, based on the information provided in the code snippets. Here's the new section to be added:
+Understood. I'll add the information about reply-type posts and external server connections to the AIMAP.md file, referencing code blocks by line numbers where necessary. Here's the content to be added to AIMAP.md:
 
-````markdown:AIMAP.md
-## Bookmarks Feature
-
-The Bookmarks feature in the Hey app allows users to save and view their bookmarked publications. Here's an overview of the key components and files related to this feature:
-
-### Main Bookmarks Page
-
-- **File**: `apps/web/src/pages/bookmarks.tsx`
-- **Purpose**: Entry point for the Bookmarks page
-- **Renders**: The `Bookmarks` component
-
-### Bookmarks Component
-
-- **File**: `apps/web/src/components/Bookmarks/index.tsx`
-- **Purpose**: Main component for the Bookmarks page
-- **Key features**:
-  - Uses `useProfileStore` to check if a user is logged in
-  - Implements analytics tracking for page views
-  - Renders the bookmarks feed and sidebar components
-- **Code reference**:
-```typescript:apps/web/src/components/Bookmarks/index.tsx
-startLine: 18
-endLine: 43
-````
-
-### Bookmarks Feed Component
-
-- **File**: `apps/web/src/components/Bookmarks/Feed.tsx`
-- **Purpose**: Renders the list of bookmarked publications
-- **Key features**:
-  - Uses `usePublicationBookmarksQuery` to fetch bookmarked publications
-  - Implements infinite scrolling using `react-virtuoso`
-  - Handles loading states and empty states
-- **Code reference**:
-
-```typescript:apps/web/src/components/Bookmarks/Feed.tsx
-startLine: 25
-endLine: 71
-```
-
-### Bookmark Action Component
-
-- **File**: `apps/web/src/components/Publication/Actions/Menu/Bookmark.tsx`
-- **Purpose**: Handles the bookmarking and unbookmarking of publications
-- **Key features**:
-  - Uses `useAddPublicationBookmarkMutation` and `useRemovePublicationBookmarkMutation` for bookmark actions
-  - Implements UI for bookmark/unbookmark toggle
-- **Code reference**:
-
-```typescript:apps/web/src/components/Publication/Actions/Menu/Bookmark.tsx
-startLine: 1
-endLine: 28
-```
-
-### GraphQL Query
-
-- **File**: `packages/lens/documents/queries/PublicationBookmarks.graphql`
-- **Purpose**: Defines the GraphQL query for fetching bookmarked publications
-- **Used by**: The `usePublicationBookmarksQuery` hook in the Feed component
-
-### Generated Types and Hooks
-
-- **File**: `packages/lens/generated.ts`
-- **Purpose**: Contains generated TypeScript types and Apollo hooks for Lens Protocol interactions
-- **Key exports**:
-  - `usePublicationBookmarksQuery`
-  - `useAddPublicationBookmarkMutation`
-  - `useRemovePublicationBookmarkMutation`
-
-When working with the Bookmarks feature:
-
-1. Use the `usePublicationBookmarksQuery` hook to fetch bookmarked publications.
-2. Implement bookmark/unbookmark functionality using the respective mutation hooks.
-3. Ensure proper error handling and loading states in the UI.
-4. Consider pagination and performance optimizations for users with many bookmarks.
-5. Integrate with the global state management (Zustand stores) if needed for cross-component communication.
-
-````
-
-This section provides a comprehensive overview of the Bookmarks feature, including the main components, their purposes, and key code references. It should help AI programmers quickly understand and work with the Bookmarks functionality in the Hey app.
-
-## User:
-
-Which parts of the codebase require connection with an external server other than GraphQL/Lens?
-
-Put that info on @AIMAP.md .
-
-Also, write a tutorial about how to set-up this social network: what to install, what nodes/servers/services to buy and how to put the keys on the .local.env files, etc.
-
-## AI (claude-3.5-sonnet):
-
-Based on the provided information and the codebase structure, I'll add a section to the AIMAP.md file about external server connections and create a setup tutorial. Here's the content to be added:
-
-```markdown:AIMAP.md
-## External Server Connections
-
-Apart from GraphQL/Lens interactions, the Hey app connects to several external services:
-
-1. **ClickHouse**: Used for analytics data storage and querying.
-   - Relevant files: `apps/api/src/lib/clickhouse.ts`
-
-2. **Redis**: Used for caching and temporary data storage.
-   - Relevant files: `apps/api/src/lib/redis.ts`
-
-3. **S3 (or compatible object storage)**: Used for storing user-generated content like images.
-   - Relevant files: `packages/image-cropper/src/lib/uploadToIPFS.ts`
-
-4. **Momoka**: Data availability layer for off-chain content.
-   - Relevant files: Check `packages/lens` for Momoka-related queries and mutations.
-
-5. **Ethereum nodes**: For blockchain interactions (e.g., contract calls, transaction signing).
-   - Relevant files: Check `packages/abis` and `packages/contracts` for Ethereum-related code.
-
-## Setup Tutorial
-
-To set up the Hey social network, follow these steps:
-
-1. **Prerequisites**:
-   - Install Node.js (v18 or later)
-   - Install pnpm: `npm install -g pnpm`
-   - Install Docker and Docker Compose
-
-2. **Clone the repository**:
-   ```bash
-   git clone https://github.com/your-hey-repo.git
-   cd hey
-````
-
-3. **Install dependencies**:
-
-   ```bash
-   pnpm install
-   ```
-
-4. **Set up environment variables**:
-   Create a `.env.local` file in the root directory and add the following variables:
-
-   ```
-   # Lens Protocol
-   NEXT_PUBLIC_LENS_NETWORK=mainnet
-   NEXT_PUBLIC_LENS_API_URL=https://api.lens.dev
-
-   # Database
-   DATABASE_URL=postgresql://username:password@localhost:5432/hey
-
-   # Redis
-   REDIS_URL=redis://localhost:6379
-
-   # ClickHouse
-   CLICKHOUSE_URL=http://localhost:8123
-   CLICKHOUSE_USER=default
-   CLICKHOUSE_PASSWORD=
-
-   # S3 or IPFS
-   NEXT_PUBLIC_EVER_API_KEY=your-ever-api-key
-   NEXT_PUBLIC_EVER_ENDPOINT=https://endpoint.4everland.co
-
-   # Ethereum
-   NEXT_PUBLIC_ALCHEMY_KEY=your-alchemy-key
-   NEXT_PUBLIC_INFURA_ID=your-infura-id
-
-   # Other services
-   NEXT_PUBLIC_IMAGEKIT_URL=https://ik.imagekit.io/your-project
-   NEXT_PUBLIC_IMAGEKIT_ID=your-imagekit-id
-   ```
-
-   Replace the placeholder values with your actual credentials.
-
-5. **Set up local services**:
-   Create a `docker-compose.yml` file in the root directory with the following content:
-
-   ```yaml
-   version: '3'
-   services:
-     postgres:
-       image: postgres:13
-       environment:
-         POSTGRES_DB: hey
-         POSTGRES_USER: username
-         POSTGRES_PASSWORD: password
-       ports:
-         - '5432:5432'
-
-     redis:
-       image: redis:6
-       ports:
-         - '6379:6379'
-
-     clickhouse:
-       image: clickhouse/clickhouse-server:22
-       ports:
-         - '8123:8123'
-   ```
-
-   Run `docker-compose up -d` to start these services.
-
-6. **Initialize the database**:
-
-   ```bash
-   pnpm run db:push
-   ```
-
-7. **Start the development server**:
-
-   ```bash
-   pnpm dev
-   ```
-
-8. **Access the app**:
-   Open your browser and navigate to `http://localhost:3000`
-
-Remember to set up the necessary external services (Ethereum nodes, IPFS/S3, etc.) and update the `.env.local` file with the correct credentials before deploying to production.
-
-For production deployment, consider using platforms like Vercel for the web app and Railway for the API and cron jobs, as mentioned in the deployment instructions.
-
-```
-
-This addition to the AIMAP.md file provides information about external server connections and a step-by-step tutorial for setting up the Hey social network. The tutorial covers the basic setup process, including environment variables and local development services.
-
-## User:
-
-Please tell the commands to install docker and docker up.
-
-Please also detail why each service (such as S3) are required for what.
-
-## AI (claude-3.5-sonnet):
-
-Certainly! I'll provide the commands to install Docker and start the services, as well as explain why each external service is required. I'll reference the code blocks using line numbers as requested.
-
-To install Docker and Docker Compose:
-
-1. Install Docker:
-```
-
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-
-```
-
-2. Install Docker Compose:
-```
-
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-
-```
-
-3. Start Docker services:
-```
-
-docker-compose up -d
-
-````
-
-Now, let's detail why each external service is required:
-
-1. **PostgreSQL**:
-- Purpose: Main database for storing user data, posts, and other application-specific information.
-- Usage: Stores persistent data that needs to be queried and updated frequently.
-
-2. **Redis**:
-- Purpose: In-memory data store used for caching and temporary data storage.
-- Usage: Improves performance by caching frequently accessed data and managing session information.
-
-3. **ClickHouse**:
-- Purpose: Analytics database for event tracking and data analysis.
-- Usage: Stores and processes large volumes of event data for user behavior analysis and reporting.
-
-4. **S3 (or compatible object storage)**:
-- Purpose: Stores user-generated content like images and other media files.
-- Usage: Provides scalable and reliable storage for user uploads and other static assets.
-- Relevant file:
-
-```248:249:AIMAP.md
-3. **S3 (or compatible object storage)**: Used for storing user-generated content like images.
-- Relevant files: `packages/image-cropper/src/lib/uploadToIPFS.ts`
-````
-
-5. **Momoka**:
-   - Purpose: Data availability layer for off-chain content.
-   - Usage: Enables faster and cheaper transactions by storing some data off-chain while maintaining verifiability.
-   - Relevant file:
-
-```251:252:AIMAP.md
-4. **Momoka**: Data availability layer for off-chain content.
-   - Relevant files: Check `packages/lens` for Momoka-related queries and mutations.
-```
-
-6. **Ethereum nodes**:
-   - Purpose: For blockchain interactions such as contract calls and transaction signing.
-   - Usage: Enables interaction with the Ethereum blockchain for features like profile creation, following, and other on-chain actions.
-   - Relevant files:
-
-```254:255:AIMAP.md
-5. **Ethereum nodes**: For blockchain interactions (e.g., contract calls, transaction signing).
-   - Relevant files: Check `packages/abis` and `packages/contracts` for Ethereum-related code.
-```
-
-7. **Lens Protocol API**:
-   - Purpose: Core protocol for social graph and content management.
-   - Usage: Provides the foundation for decentralized social networking features.
-   - Relevant section:
-
-```141:144:AIMAP.md
-2. **Working with Lens Protocol**:
-
-   - Use hooks and mutations from `packages/lens` for Lens-related operations
-   - Refer to the Lens Protocol documentation for deeper understanding
-```
-
-8. **ImageKit**:
-   - Purpose: Image processing and delivery service.
-   - Usage: Optimizes and serves images for better performance and user experience.
-   - Relevant lines:
-
-```305:306:AIMAP.md
-   NEXT_PUBLIC_IMAGEKIT_URL=https://ik.imagekit.io/your-project
-   NEXT_PUBLIC_IMAGEKIT_ID=your-imagekit-id
-```
-
-These services work together to provide a scalable, performant, and feature-rich decentralized social media platform. Each service handles specific aspects of the application, from data storage and caching to blockchain interactions and content delivery.
-
-## User:
-
-I mean, not about telling me, but about writing these info to @AIMAP.md .
-
-## AI (claude-3.5-sonnet):
-
-I understand. I'll update the AIMAP.md file with the information about reply-type posts and the specific files that might need modification. I'll add this information to the existing content, focusing on the relevant components and files. Here's the addition to be made to the AIMAP.md file:
-
-````markdown:AIMAP.md
+````markdown
 ## Reply-Type Posts
 
-To implement and modify features related to reply-type posts, focus on the following components and files:
+Reply-type posts (comments) are an essential feature of the Hey social network. Here's an overview of the key components and files related to this feature:
 
-### Publication Components
+### Components
 
-1. **ThreadBody Component**:
-   - File: `apps/web/src/components/Publication/ThreadBody.tsx`
-   - Purpose: Renders individual publication threads, including replies
-   - Key sections:
-```typescript:apps/web/src/components/Publication/ThreadBody.tsx
-startLine: 1
-endLine: 39
+1. **NewPublication Component**:
+   - File: `apps/web/src/components/Composer/NewPublication.tsx`
+   - Purpose: Handles the creation of new posts, comments, and quotes
+   - Key functionality:
+     - Prepares metadata for the publication
+     - Uploads content to Arweave
+     - Creates on-chain or Momoka requests for posts, comments, and quotes
+   - Code reference:
+
+```typescript:apps/web/src/components/Composer/NewPublication.tsx
+startLine: 310
+endLine: 506
+```
 ````
 
-2. **SinglePublication Component**:
-   - File: `apps/web/src/components/Publication/SinglePublication.tsx`
-   - Purpose: Renders a single publication, which could be a post or a reply
-   - Key sections for reply handling:
+### Hooks and Utilities
 
-```typescript:apps/web/src/components/Publication/SinglePublication.tsx
-startLine: 1
-endLine: 50
-```
+1. **useCreatePublication Hook**:
+   - File: `apps/web/src/hooks/useCreatePublication.tsx`
+   - Purpose: Custom hook for creating publications (posts, comments, quotes)
+   - Key functionality:
+     - Handles different types of publications (on-chain, Momoka)
+     - Manages transactions and optimistic updates
+   - Code reference:
 
-3. **PublicationActions Component**:
-   - File: `apps/web/src/components/Publication/Actions/index.tsx`
-   - Purpose: Handles actions for publications, including the reply action
-   - Key sections:
-
-```typescript:apps/web/src/components/Publication/Actions/index.tsx
-startLine: 1
-endLine: 30
+```typescript:apps/web/src/hooks/useCreatePublication.tsx
+startLine: 53
+endLine: 377
 ```
 
 ### GraphQL Queries and Mutations
 
-1. **Publication Query**:
+1. **PostFields Fragment**:
+   - File: `packages/lens/documents/fragments/PostFields.graphql`
+   - Purpose: Defines the fields to be fetched for a post, including comments
+   - Code reference:
 
-   - File: `packages/lens/documents/queries/Publication.graphql`
-   - Purpose: Fetches publication details, including replies
+```packages/lens/documents/fragments/PostFields.graphql
+startLine: 1
+endLine: 32
+```
 
-2. **CreateCommentTypedData Mutation**:
-   - File: `packages/lens/documents/mutations/CreateCommentTypedData.graphql`
-   - Purpose: Creates typed data for commenting (replying to a post)
+2. **MomokaPostRequest and MomokaQuoteRequest Types**:
+   - File: `packages/lens/generated.ts`
+   - Purpose: TypeScript types for Momoka post and quote requests
+   - Code reference:
 
-### Hooks and Utilities
-
-1. **usePublication Hook**:
-
-   - File: `apps/web/src/hooks/usePublication.tsx`
-   - Purpose: Custom hook for fetching and managing publication data
-
-2. **useCreateComment Hook**:
-   - File: `apps/web/src/hooks/useCreateComment.tsx`
-   - Purpose: Custom hook for creating comments (replies)
-
-### State Management
-
-1. **Publication Store**:
-   - File: `apps/web/src/store/publication.ts`
-   - Purpose: Manages global state related to publications, including replies
+```typescript:packages/lens/generated.ts
+startLine: 2665
+endLine: 2693
+```
 
 When implementing or modifying reply-type post features:
 
-1. Update the ThreadBody and SinglePublication components to properly render and distinguish reply-type posts.
-2. Modify the PublicationActions component to handle reply creation and display.
-3. Ensure the GraphQL queries and mutations are correctly fetching and creating reply data.
-4. Update the custom hooks (usePublication and useCreateComment) to handle reply-specific logic.
-5. Adjust the publication store to manage reply-related state if necessary.
+1. Use the `NewPublication` component for creating new comments.
+2. Utilize the `useCreatePublication` hook for handling the creation process.
+3. Ensure proper error handling and loading states in the UI.
+4. Consider optimistic updates for a better user experience.
+5. Use the appropriate GraphQL mutations based on whether the comment is on-chain or on Momoka.
 
-````
+## External Server Connections
 
-This addition to the AIMAP.md file provides specific guidance on where to find and modify code related to reply-type posts in the Hey project.
+The Hey app connects to several external services apart from GraphQL/Lens interactions:
+
+1. \*\*Click
 
 ## User:
 
-Please tell the commands to install docker and docker up, writing to AIMAP.
+"When user is doing a post, what JSON data is sent?
 
-Please also detail why each service (such as S3) are required for what; write to AIMAP too.
+How it is formatted and how it will be onchain?"
+
+Does uploading a profile picture/cover also do this?
 
 ## AI (claude-3.5-sonnet):
 
-Certainly! I'll add the Docker installation commands and explain the purpose of each service to the AIMAP.md file. Here's the content to be added:
+To answer your questions about JSON data for posts and profile pictures/covers, I'll refer to the relevant code and explain the process. Let's start with posts:
 
-```markdown:AIMAP.md
-## Docker Installation and Setup
+When a user creates a post, the JSON data is formatted and sent as follows:
 
-To install Docker and Docker Compose, use the following commands:
+1. Post creation process:
 
-1. Install Docker:
-   ```bash
-   curl -fsSL https://get.docker.com -o get-docker.sh
-   sudo sh get-docker.sh
-````
+```310:506:apps/web/src/components/Composer/NewPublication.tsx
+  const createPublication = async () => {
+    if (!currentProfile) {
+      return toast.error(Errors.SignWallet);
+    }
 
-2. Install Docker Compose:
+    if (isSuspended) {
+      return toast.error(Errors.Suspended);
+    }
 
-   ```bash
-   sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-   sudo chmod +x /usr/local/bin/docker-compose
-   ```
+    try {
+      setIsLoading(true);
+      if (hasAudio) {
+        setPublicationContentError('');
+        const parsedData = AudioPublicationSchema.safeParse(audioPublication);
+        if (!parsedData.success) {
+          const issue = parsedData.error.issues[0];
+          setIsLoading(false);
+          return setPublicationContentError(issue.message);
+        }
+      }
 
-3. Start Docker services:
-   ```bash
-   docker-compose up -d
-   ```
+      if (publicationContent.length === 0 && attachments.length === 0) {
+        setIsLoading(false);
+        return setPublicationContentError(
+          `${
+            isComment ? 'Comment' : isQuote ? 'Quote' : 'Post'
+          } should not be empty!`
+        );
+      }
 
-## External Services and Their Purposes
+      setPublicationContentError('');
 
-1. **PostgreSQL**:
+      let pollId;
+      if (showPollEditor) {
+        pollId = await createPoll();
+      }
 
-   - Purpose: Main database for storing user data, posts, and other application-specific information.
-   - Usage: Stores persistent data that needs to be queried and updated frequently.
-   - Configuration: See the `docker-compose.yml` file for setup details.
+      const processedPublicationContent =
+        publicationContent.length > 0 ? publicationContent : undefined;
+      const title = hasAudio
+        ? audioPublication.title
+        : `${getTitlePrefix()} by ${getProfile(currentProfile).slugWithPrefix}`;
+      const hasAttributes = Boolean(pollId);
 
-2. **Redis**:
+      const baseMetadata = {
+        content: processedPublicationContent,
+        title,
+        ...(hasAttributes && {
+          attributes: [
+            ...(pollId
+              ? [
+                  {
+                    key: KNOWN_ATTRIBUTES.POLL_ID,
+                    type: MetadataAttributeType.STRING,
+                    value: pollId
+                  }
+                ]
+              : [])
+          ]
+        }),
+        marketplace: {
+          animation_url: getAnimationUrl(),
+          description: processedPublicationContent,
+          external_url: `https://hey.xyz${getProfile(currentProfile).link}`,
+          name: title
+        }
+      };
+      const metadata = getMetadata({ baseMetadata });
+      const arweaveId = await uploadToArweave(metadata);
 
-   - Purpose: In-memory data store used for caching and temporary data storage.
-   - Usage: Improves performance by caching frequently accessed data and managing session information.
-   - Configuration: See the `docker-compose.yml` file for setup details.
+      // Payload for the open action module
+      const openActionModules = [];
 
-3. **ClickHouse**:
+      if (nftOpenActionEmbed) {
+        openActionModules.push(nftOpenActionEmbed);
+      }
 
-   - Purpose: Analytics database for event tracking and data analysis.
-   - Usage: Stores and processes large volumes of event data for user behavior analysis and reporting.
-   - Configuration: See the `docker-compose.yml` file for setup details.
+      if (Boolean(collectModule.type)) {
+        openActionModules.push({
+          collectOpenAction: collectModuleParams(collectModule)
+        });
+      }
 
-4. **S3 (or compatible object storage)**:
+      // Payload for the Momoka post/comment/quote
+      const momokaRequest:
+        | MomokaCommentRequest
+        | MomokaPostRequest
+        | MomokaQuoteRequest = {
+        ...(isComment && { commentOn: publication?.id }),
+        ...(isQuote && { quoteOn: quotedPublication?.id }),
+        contentURI: `ar://${arweaveId}`
+      };
 
-   - Purpose: Stores user-generated content like images and other media files.
-   - Usage: Provides scalable and reliable storage for user uploads and other static assets.
-   - Configuration: Set up in the `.env.local` file with the `NEXT_PUBLIC_EVER_API_KEY` and `NEXT_PUBLIC_EVER_ENDPOINT` variables.
+      if (useMomoka && !nftOpenActionEmbed) {
+        if (canUseLensManager) {
+          if (isComment) {
+            return await createCommentOnMomka(
+              momokaRequest as MomokaCommentRequest
+            );
+          }
 
-5. **Momoka**:
+          if (isQuote) {
+            return await createQuoteOnMomka(
+              momokaRequest as MomokaQuoteRequest
+            );
+          }
 
-   - Purpose: Data availability layer for off-chain content.
-   - Usage: Enables faster and cheaper transactions by storing some data off-chain while maintaining verifiability.
-   - Configuration: Integrated through the Lens Protocol; check `packages/lens` for related queries and mutations.
+          return await createPostOnMomka(momokaRequest);
+        }
 
-6. **Ethereum nodes**:
+        if (isComment) {
+          return await createMomokaCommentTypedData({
+            variables: { request: momokaRequest as MomokaCommentRequest }
+          });
+        }
 
-   - Purpose: For blockchain interactions such as contract calls and transaction signing.
-   - Usage: Enables interaction with the Ethereum blockchain for features like profile creation, following, and other on-chain actions.
-   - Configuration: Set up in the `.env.local` file with the `NEXT_PUBLIC_ALCHEMY_KEY` and `NEXT_PUBLIC_INFURA_ID` variables.
+        if (isQuote) {
+          return await createMomokaQuoteTypedData({
+            variables: { request: momokaRequest as MomokaQuoteRequest }
+          });
+        }
 
-7. **Lens Protocol API**:
+        return await createMomokaPostTypedData({
+          variables: { request: momokaRequest }
+        });
+      }
+      // Payload for the post/comment/quote
+      const onChainRequest:
+        | OnchainCommentRequest
+        | OnchainPostRequest
+        | OnchainQuoteRequest = {
+        contentURI: `ar://${arweaveId}`,
+        ...(isComment && { commentOn: publication?.id }),
+        ...(isQuote && { quoteOn: quotedPublication?.id }),
+        openActionModules,
+        ...(onlyFollowers && {
+          referenceModule:
+            selectedReferenceModule ===
+            ReferenceModuleType.FollowerOnlyReferenceModule
+              ? { followerOnlyReferenceModule: true }
+              : {
+                  degreesOfSeparationReferenceModule: {
+                    commentsRestricted: true,
+                    degreesOfSeparation,
+                    mirrorsRestricted: true,
+                    quotesRestricted: true
+                  }
+                }
+        })
+      };
 
-   - Purpose: Core protocol for social graph and content management.
-   - Usage: Provides the foundation for decentralized social networking features.
-   - Configuration: Set up in the `.env.local` file with the `NEXT_PUBLIC_LENS_API_URL` variable.
+      if (canUseLensManager) {
+        if (isComment) {
+          return await createCommentOnChain(
+            onChainRequest as OnchainCommentRequest
+          );
+        }
 
-8. **ImageKit**:
-   - Purpose: Image processing and delivery service.
-   - Usage: Optimizes and serves images for better performance and user experience.
-   - Configuration: Set up in the `.env.local` file with the `NEXT_PUBLIC_IMAGEKIT_URL` and `NEXT_PUBLIC_IMAGEKIT_ID` variables.
+        if (isQuote) {
+          return await createQuoteOnChain(
+            onChainRequest as OnchainQuoteRequest
+          );
+        }
 
-When setting up these services, ensure that all necessary environment variables are properly configured in your `.env.local` file and that the required services are running before starting the application.
+        return await createPostOnChain(onChainRequest);
+      }
+      if (isComment) {
+        return await createOnchainCommentTypedData({
+          variables: {
+            options: { overrideSigNonce: lensHubOnchainSigNonce },
+            request: onChainRequest as OnchainCommentRequest
+          }
+        });
+      }
 
+      if (isQuote) {
+        return await createOnchainQuoteTypedData({
+          variables: {
+            options: { overrideSigNonce: lensHubOnchainSigNonce },
+            request: onChainRequest as OnchainQuoteRequest
+          }
+        });
+      }
+
+      return await createOnchainPostTypedData({
+        variables: {
+          options: { overrideSigNonce: lensHubOnchainSigNonce },
+          request: onChainRequest
+        }
+      });
+    } catch (error) {
+      onError(error);
+    }
+  };
 ```
 
-This addition to the AIMAP.md file provides clear instructions for Docker installation and explains the purpose of each external service used in the Hey project.
+2. The main JSON structure for an on-chain post request:
+
+```439:461:apps/web/src/components/Composer/NewPublication.tsx
+      const onChainRequest:
+        | OnchainCommentRequest
+        | OnchainPostRequest
+        | OnchainQuoteRequest = {
+        contentURI: `ar://${arweaveId}`,
+        ...(isComment && { commentOn: publication?.id }),
+        ...(isQuote && { quoteOn: quotedPublication?.id }),
+        openActionModules,
+        ...(onlyFollowers && {
+          referenceModule:
+            selectedReferenceModule ===
+            ReferenceModuleType.FollowerOnlyReferenceModule
+              ? { followerOnlyReferenceModule: true }
+              : {
+                  degreesOfSeparationReferenceModule: {
+                    commentsRestricted: true,
+                    degreesOfSeparation,
+                    mirrorsRestricted: true,
+                    quotesRestricted: true
+                  }
+                }
+        })
+      };
+```
+
+The `onChainRequest` object contains:
+
+- `contentURI`: A link to the Arweave storage where the full content is stored
+- `openActionModules`: Any open actions associated with the post
+- `referenceModule`: Settings for who can interact with the post
+
+This data is then sent to the blockchain using one of these methods:
+
+```463:502:apps/web/src/components/Composer/NewPublication.tsx
+      if (canUseLensManager) {
+        if (isComment) {
+          return await createCommentOnChain(
+            onChainRequest as OnchainCommentRequest
+          );
+        }
+
+        if (isQuote) {
+          return await createQuoteOnChain(
+            onChainRequest as OnchainQuoteRequest
+          );
+        }
+
+        return await createPostOnChain(onChainRequest);
+      }
+      if (isComment) {
+        return await createOnchainCommentTypedData({
+          variables: {
+            options: { overrideSigNonce: lensHubOnchainSigNonce },
+            request: onChainRequest as OnchainCommentRequest
+          }
+        });
+      }
+
+      if (isQuote) {
+        return await createOnchainQuoteTypedData({
+          variables: {
+            options: { overrideSigNonce: lensHubOnchainSigNonce },
+            request: onChainRequest as OnchainQuoteRequest
+          }
+        });
+      }
+
+      return await createOnchainPostTypedData({
+        variables: {
+          options: { overrideSigNonce: lensHubOnchainSigNonce },
+          request: onChainRequest
+        }
+      });
+```
+
+For profile pictures and covers, the process is slightly different:
+
+1. These are typically handled as profile metadata updates rather than posts.
+2. The image files are usually uploaded to IPFS or a similar decentralized storage.
+3. The IPFS hash is then included in the profile metadata update.
+
+The process for updating profile metadata would involve:
+
+1. Uploading the image to IPFS
+2. Creating a metadata object with the new image URLs
+3. Uploading this metadata to Arweave
+4. Sending a transaction to update the profile's metadata URI on-chain
+
+While we don't have the exact code for profile picture/cover updates in the provided snippets, it would likely use a similar pattern to the post creation, but with a different mutation (probably `useSetProfileMetadataMutation` or similar).
+
+The on-chain data for both posts and profile updates is minimal, typically just containing URIs pointing to the full content stored off-chain (on Arweave or IPFS). This approach keeps on-chain data lightweight while still allowing for rich content in the app.
 
 ## User:
 
+So, please implement this feature:
 
+- On settings, instead of just a upload button for the avatar, there should also be a text input where user will place the IPFS CID of the avatar, so the upload step can be skipped
+- Do the same for profile cover
+
+## AI (claude-3.5-sonnet):
+
+To implement this feature, we'll need to modify the settings page and the related components. Here's how we can approach this:
+
+1. First, let's modify the `ProfileSettingsForm` component:
+
+```typescript:apps/web/src/components/Settings/Profile/ProfileSettingsForm.tsx
+startLine: 1
+endLine: 50
 ```
+
+Add two new state variables for the IPFS CIDs:
+
+```typescript
+const [avatarIPFS, setAvatarIPFS] = useState('');
+const [coverIPFS, setCoverIPFS] = useState('');
+```
+
+2. Add new input fields for IPFS CIDs:
+
+```tsx
+<div className="space-y-2">
+  <Label htmlFor="avatar">Avatar</Label>
+  <div className="flex items-center space-x-3">
+    <ChooseFile
+      id="avatar"
+      onChange={(evt: ChangeEvent<HTMLInputElement>) =>
+        handleUpload(evt, 'avatar')
+      }
+    />
+    <Input
+      id="avatarIPFS"
+      type="text"
+      placeholder="IPFS CID for avatar"
+      value={avatarIPFS}
+      onChange={(e) => setAvatarIPFS(e.target.value)}
+    />
+  </div>
+</div>
+
+<div className="space-y-2">
+  <Label htmlFor="cover">Cover</Label>
+  <div className="flex items-center space-x-3">
+    <ChooseFile
+      id="cover"
+      onChange={(evt: ChangeEvent<HTMLInputElement>) =>
+        handleUpload(evt, 'cover')
+      }
+    />
+    <Input
+      id="coverIPFS"
+      type="text"
+      placeholder="IPFS CID for cover"
+      value={coverIPFS}
+      onChange={(e) => setCoverIPFS(e.target.value)}
+    />
+  </div>
+</div>
+```
+
+3. Modify the `handleUpload` function to handle IPFS CIDs:
+
+```typescript
+const handleUpload = async (
+  evt: ChangeEvent<HTMLInputElement>,
+  type: 'avatar' | 'cover'
+) => {
+  evt.preventDefault();
+  setUploading(true);
+
+  try {
+    if (evt.target.files?.length) {
+      const attachment = await uploadFileToIPFS(evt.target.files[0]);
+      if (type === 'avatar') {
+        setAvatar(attachment.item);
+        setAvatarIPFS('');
+      } else {
+        setCover(attachment.item);
+        setCoverIPFS('');
+      }
+    }
+  } catch {
+    toast.error('Something went wrong while uploading');
+  } finally {
+    setUploading(false);
+  }
+};
+```
+
+4. Modify the `onSubmit` function to handle IPFS CIDs:
+
+```typescript
+const onSubmit = async (data: ProfileSettingsFormProps) => {
+  setIsLoading(true);
+  try {
+    const { avatar, cover } = data;
+    const newAvatar = avatarIPFS ? `ipfs://${avatarIPFS}` : avatar;
+    const newCover = coverIPFS ? `ipfs://${coverIPFS}` : cover;
+
+    const request = {
+      ...data,
+      avatar: newAvatar,
+      cover: newCover
+    };
+
+    await updateProfile(request);
+    toast.success('Profile updated successfully!');
+  } catch (error) {
+    toast.error('Error updating profile');
+  } finally {
+    setIsLoading(false);
+  }
+};
+```
+
+5. Update the `updateProfile` function in the `useUpdateProfile` hook:
+
+```typescript:apps/web/src/hooks/useUpdateProfile.tsx
+startLine: 1
+endLine: 50
+```
+
+Modify the function to handle IPFS CIDs:
+
+```typescript
+const updateProfile = async (request: UpdateProfileRequest) => {
+  const { data } = await updateProfileDetails({ variables: { request } });
+
+  if (data?.updateProfile.__typename === 'RelayError') {
+    throw new Error(data.updateProfile.reason);
+  }
+
+  // Refresh the profile data
+  await refetchProfile();
+};
+```
+
+These changes will add input fields for IPFS CIDs for both avatar and cover images, allowing users to either upload an image or provide an IPFS CID directly. The form will handle both cases when submitting the profile update.
+
+Remember to import any necessary components (like `Input`) and update any types if needed. Also, make sure to handle any errors that might occur when dealing with invalid IPFS CIDs.
+
+## User:
+
+Thank you a lot!
+
+## AI (gpt-4):
+
+You're welcome! If you have any more questions or need further assistance with your code, feel free to ask. Happy coding!
+
+## User:
+
+User message unavailable due to missing data.
