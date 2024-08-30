@@ -1,10 +1,9 @@
 - PWA support https://vite-pwa-org.netlify.app/guide/pwa-minimal-requirements
 
 ---------------------------------------------------------------------------------------
-was still being implemented, have to complement the latest commits:
-- Tell abt another type of ratio: when an answer have more likes than the root post
--
-show a "percent until ratio", which will come as "% ratioed", only when it reach 50%
+was still being implemented, have to complement [I MEAN, THESE ARE INCOMPLETE]:
+- Tell abt another type of ratio: when an answer have more likes than the root post ; show a "percent until ratio", which will come as "% ratioed", only when it reach 50%
+- Add/Update avatar/cover via IPFS CID text inputs
 ---------------------------------------------------------------------------------------
 what post to test the 50% ratio: https://web-jv1mlfku0-heyxyz.vercel.app/posts/0x04e14d-0x10-DA-0157d38e
 where to test Peepz: https://github.com/heyxyz/hey/pull/5244
