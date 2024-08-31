@@ -1,27 +1,32 @@
-- PWA support https://vite-pwa-org.netlify.app/guide/pwa-minimal-requirements
+- From Upstream: fetch, solve conflicts, merge https://github.com/danimesq/heypeepz/pull/2
+- wait for cursor-chat-export to be fixed
 
----------------------------------------------------------------------------------------
-was still being implemented, have to complement [I MEAN, THESE ARE INCOMPLETE]:
-- Tell abt another type of ratio: when an answer have more likes than the root post ; show a "percent until ratio", which will come as "% ratioed", only when it reach 50%
-- Add/Update avatar/cover via IPFS CID text inputs
----------------------------------------------------------------------------------------
-what post to test the 50% ratio: https://web-jv1mlfku0-heyxyz.vercel.app/posts/0x04e14d-0x10-DA-0157d38e
-where to test Peepz: https://github.com/heyxyz/hey/pull/5244
-
-- set Farcaster, Threads, Bluesky, Mastodon and Peepeth profiles!
-- set profile pic from IPFS! button on settings on the right side of the "Choose" file button in the "Avatar" heading ; can do the same for Cover
-- understand how Hey/Peepz sends data to be posted, so make this feature: profile backgrounds! (from either file or IPFS)
-- understand how Hey/Peepz sends data to be posted, so make a diff for covers: classic (horizontal), portrait
 -
+
+- best PR possible upstream: PWA support https://vite-pwa-org.netlify.app/guide/pwa-minimal-requirements
+- next PR then: on a reply, above Hey will show to what post it is replying to (as in Twitter and others)
+- then another next PR: - "Threads" tab on user profile (a Thread is a root post that has a dept of 2 sequential replies from OP)
+- then another next PR²: current covers will be considered mobile (bc portrait will be the future as phones overtook desktop), while the desktop category will be supported only on Lens
+-
+- this upstream PR is slated for failure, but let's try: - set Farcaster, Threads, Bluesky and Mastodon profiles!
+
+- Peepz-exclusive feature: Luck of the Day (add to a file separating what features should be removed later, bc this feature should appear only on Ogurt)
+- understand how Hey/Peepz sends data to be posted, so make this feature: profile backgrounds! (from either file or IPFS)
+
 - https://hey-assets.b-cdn.net/images/app-icon/0.png
 - https://hey-assets.b-cdn.net/images/source/orb.png
 -
 - https://vercel.com/heyxyz/web/8rkXFEgo1RenpFMS3FKbee82AJmi/og
+(these will also be added to a file, telling these should be removed once Peepz sets up its own CDN to work like Hey)
 
-- "Threads" tab on user profile (a Thread is a root post that has a dept of 2 sequential replies from OP)
+---------------------------------------------------------------------------------------
+was still being implemented, have to complement [I MEAN, THESE ARE INCOMPLETE]:
+- Tell abt another type of ratio: when an answer have more likes than the root post ; show a "percent until ratio", which will come as "% ratioed", only when it reach 50% ; what post to test the 50% ratio: https://web-jv1mlfku0-heyxyz.vercel.app/posts/0x04e14d-0x10-DA-0157d38e ; Notify OP when a reply has 50% and 100% ratioed (first, understand how the codebase handles notifications on Lens)
+- Add/Update avatar/cover via IPFS CID text inputs
+---------------------------------------------------------------------------------------
 
-Notify OP when a reply has 50% and 100% ratioed (first, understand how the codebase handles notifications on Lens)
+- set profile pic from IPFS! button on settings on the right side of the "Choose" file button in the "Avatar" heading ; can do the same for Cover
 
 - on "Setup your Peepz profile", show this on profile too, with a progressbar
 
-- Hero.tsx: incentivize to use Trust Wallet's Swift
+- Hero.tsx: incentivize to use Trust Wallet's Swift (but first fix issue by asking support team why I can't create my own)
