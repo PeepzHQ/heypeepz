@@ -1,23 +1,43 @@
-commit QmZr44ib5GA59G6nw2XoCsa9r8nRVkURJiQ39FJifprdYK
+commit Qmaur4a3dGwUh7Nk6eqw7LzwaXdCzDSR7XnuZ3hBgDPp5K
 Branch: main
 Signed-off by: danimesq.eth (0xDDfC2e10702d8A781727A34D83B3bb3CA94a3E91)
-Signature: d37317e83bafea218737908621f7c1cf7517f64e61802c75e2b6a4627c68e9fc10e116bc2129477831bcfab280b72ef122b0df5987430eb963e693a1836dc6a301
+Signature: 98570f4d3a2bf3951688f5571027fd9820b0921277dcfccf6e908b16d69707a33227f2f40a5926c5d1f913c89eb4d65f16f5e58d3edbb0da13ae2ed93c33da9401
 
 ------------------------------
 
-Commit CID if including git's SHA1: QmRxu3F6yJ5aJBRHQt4QqngMcYQf4wXyuA9yQt5NJBxYK7
-Commit CID if containing only file hashes: QmajN6h9wBgrEAmfmoTFAtzjW5Whb9qQs3sDo8naSZLRvd
+Commit CID if including git's SHA1: QmbFsMCqJ6QFJZyF7hoKkgiWfg9knbaha573a34GAnML2C
+Commit CID if containing only file hashes: QmUyfEUCkpYSwmUWxQxF68qeYerARMoXdWp7hSfakkDcyu
 
 ------------------------------
 
 .gitmeta version: r8
-Local folder: /home/daniella/Desktop/heypeepz
+Local folder: /home/daniella/Desktop/Untitled Folder 2/heypeepz
 Remote Name: origin
 Remote URL: https://github.com/PeepzHQ/heypeepz.git
 
 ------------------------------
 
-chown -h 1000:1000 'Tasks.txt'
-chmod 0664 'Tasks.txt'
-/usr/bin/touch -hcmd "2024-08-30 21:29:58.4671026200 -0300" 'Tasks.txt'
-/usr/bin/touch -hcad "2024-08-30 21:30:05.8000376300 -0300" 'Tasks.txt'
+chown -h 1000:1000 'README.md'
+chmod 0664 'README.md'
+/usr/bin/touch -hcmd "2024-09-29 17:00:45.0211089240 -0300" 'README.md'
+/usr/bin/touch -hcad "2024-09-29 17:00:57.1228112540 -0300" 'README.md'
+chown -h 1000:1000 'img/.folderstamp1'
+chmod 0664 'img/.folderstamp1'
+/usr/bin/touch -hcmd "2024-09-29 16:55:22.8354055000 -0300" 'img/.folderstamp1'
+/usr/bin/touch -hcad "2024-09-29 16:55:58.8940880710 -0300" 'img/.folderstamp1'
+chown -h 1000:1000 'img/.folderstamp2'
+chmod 0664 'img/.folderstamp2'
+/usr/bin/touch -hcmd "2024-09-29 16:55:58.9030865400 -0300" 'img/.folderstamp2'
+/usr/bin/touch -hcad "2024-09-29 16:58:36.7244350440 -0300" 'img/.folderstamp2'
+chown -h 1000:1000 'img/readme-cover.png'
+chmod 0664 'img/readme-cover.png'
+/usr/bin/touch -hcmd "2024-09-29 16:57:43.7197170070 -0300" 'img/readme-cover.png'
+/usr/bin/touch -hcad "2024-09-29 16:57:47.2462132010 -0300" 'img/readme-cover.png'
+chown -h 1000:1000 'img/readme-cover.png.log.html5'
+chmod 0664 'img/readme-cover.png.log.html5'
+/usr/bin/touch -hcmd "2024-09-29 16:58:15.3213019380 -0300" 'img/readme-cover.png.log.html5'
+/usr/bin/touch -hcad "2024-09-29 16:58:36.7454322770 -0300" 'img/readme-cover.png.log.html5'
+chown -h 1000:1000 'img/readme-cover.svg'
+chmod 0755 'img/readme-cover.svg'
+/usr/bin/touch -hcmd "2024-09-04 00:08:51.9022231000 -0300" 'img/readme-cover.svg'
+/usr/bin/touch -hcad "2024-09-29 16:57:21.8529055000 -0300" 'img/readme-cover.svg'
